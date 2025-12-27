@@ -1,0 +1,57 @@
+name: publish
+
+on:
+  push:
+    tags:
+      - "app-v*"
+
+jobs:
+  build-and-release:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS Apple Silicon (arm64)
+          - os: macos-latest
+            args: --target aarch64-apple-darwin
+
+          # macOS Intel (x86_64) - 使用 GitHub 提供的 Intel 标签
+          - os: macos-15-intel
+            args: --target x86_64-apple-darwin
+
+          # Windows (NSIS exe)
+          - os: windows-latest
+            args: ""
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ startsWith(matrix.os, 'macos') && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Build and publish (Tauri)
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # tag 由推送的 app-vX.Y.Z 提供
+          tagName: ${{ github.ref_name }}
+          releaseName: "App ${{ github.ref_name }}"
+          releaseBody: "See the assets below to download and install."
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
