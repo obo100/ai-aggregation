@@ -28,18 +28,24 @@ fn create_main_window(app: &tauri::AppHandle) -> Result<tauri::WebviewWindow, ta
 }
 
 fn create_quick_window(app: &tauri::AppHandle) -> Result<tauri::WebviewWindow, tauri::Error> {
-  WebviewWindowBuilder::new(app, "quick", WebviewUrl::App("index.html#/quick".into()))
-    .title("Quick Prompt")
-    .inner_size(720.0, 154.0)
-    .center()
-    .resizable(false)
-    .decorations(false)
-    .always_on_top(true)
-    .transparent(true)
-    .shadow(true)
-    .skip_taskbar(true)
-    .visible(false)
-    .build()
+  let mut builder =
+    WebviewWindowBuilder::new(app, "quick", WebviewUrl::App("index.html#/quick".into()))
+      .title("Quick Prompt")
+      .inner_size(720.0, 154.0)
+      .center()
+      .resizable(false)
+      .decorations(false)
+      .always_on_top(true)
+      .shadow(true)
+      .skip_taskbar(true)
+      .visible(false);
+
+  #[cfg(not(target_os = "macos"))]
+  {
+    builder = builder.transparent(true);
+  }
+
+  builder.build()
 }
 
 #[tauri::command]
