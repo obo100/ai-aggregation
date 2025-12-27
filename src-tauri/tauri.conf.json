@@ -1,0 +1,37 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/core/tauri-config-schema.json",
+  "productName": "AI Aggregation",
+  "version": "0.1.0",
+  "identifier": "com.onebyone.ai-aggregation",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "security": {
+      "capabilities": [
+        "default"
+      ]
+    },
+    "windows": [
+      {
+        "label": "main",
+        "title": "AI Aggregation",
+        "url": "index.html",
+        "width": 980,
+        "height": 720,
+        "visible": false
+      }
+    ]
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/icon.ico",
+      "icons/icon.png"
+    ]
+  }
+}
